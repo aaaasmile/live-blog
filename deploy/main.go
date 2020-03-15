@@ -33,7 +33,7 @@ func main() {
 	switch *target {
 	case invido:
 		pathItems = append(pathItems, "deploy/config_files/invido_config.toml")
-		//pathItems[0] = "live-blog.bin"
+		pathItems[0] = "live-blog.bin"
 	default:
 		log.Fatalf("Deployment target %s is not recognized or not specified", *target)
 	}

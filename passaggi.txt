@@ -3,3 +3,40 @@ MySmileCv, rails e passenger. Non chiara la porta usata da passenger, credo 3000
 IolVienna, service in go che usa la porta 5568
 
 Per LiveBlog direi di usare la porta 5546
+
+
+== Compilare per linux
+Apri una nuova powershell e poi:
+$env:GOOS = "linux"
+go build -o live-blog.bin
+Con WLC si può controllare che il live-blog.bin funziona correttamente.
+
+== Deployment di live.invido.it
+Per prima cosa aggiornare il DNS aggiungendo live.invido.it
+Poi bisogna abilitare il reverse proxy con https su nginx. Parto dal file iolvienna:
+/etc/nginx/sites-available$ sudo cp vienna.invido.it  live.invido.it
+poi cambio i link http e il nome del server usando i dati del nuovo service live-blog
+sudo nano live.invido.it
+Bisogna abilitare il sito:
+sudo ln -s /etc/nginx/sites-available/live.invido.it  /etc/nginx/sites-enabled/live.invido.it
+Un test della configurazione di nginx:
+sudo nginx -t
+Ora un restart:
+sudo systemctl restart nginx
+
+Su invido.it poi si aggiorna il certificato (NOTA se questo step si fa prima di enable e available, certbot va a modificare il file default e 
+il sito live.invido.it non funziona più con "nginx: [warn] conflicting server name "live.invido.it" on [::]:443, ignored". Qui bisogna modificare il file default):
+sudo certbot --nginx -d <lista di tutti i domini> -d live.invido.it
+Alla scelta scegliere [1], non modificare nginx
+
+Ora va installata la app. Uso la dir:
+~/app/go$mkdir live-blog
+~/app/go$mkdir live-blog\current
+~/app/go$mkdir live-blog\zips
+~/app/go$mkdir live-blog\old
+Ora con lo zip nella cartella zips si esegue:
+unzip ./zips/LiveBlog_00-01-01-20200315-00_15032020-163145_invido.zip  -d ./current/
+chmod +x ./current/live-blog.bin
+
+
+
