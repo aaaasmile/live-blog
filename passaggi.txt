@@ -1,0 +1,5 @@
+Le porte su invido.it occupate sono:
+MySmileCv, rails e passenger. Non chiara la porta usata da passenger, credo 3000 o 3001.
+IolVienna, service in go che usa la porta 5568
+
+Per LiveBlog direi di usare la porta 5546

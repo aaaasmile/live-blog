@@ -1,0 +1,28 @@
+{{define "base"}}
+<html>
+
+<head>
+  <meta charset="UTF-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta name="description" content="Live Blog" />
+
+  <title>Live Blog</title>
+
+  <!-- dev vue -->
+  <script src="{{.RootUrl}}static/js/ext/vue.js"></script>
+  <script src="{{.RootUrl}}static/js/ext/vue-resource.js"></script> 
+  <!-- prod vue -->
+  <!-- <script src="{{.RootUrl}}static/js/ext/vue_prod.js"></script> -->
+
+</head>
+
+<body>
+  <div id="app"></div>
+</body>
+<script type="module">
+  import { app } from './static/js/vue/main.js'
+</script>
+
+</html>
+{{end}}
