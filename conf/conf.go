@@ -8,8 +8,9 @@ import (
 )
 
 type Config struct {
-	ServiceURL     string
-	RootURLPattern string
+	ServiceURL      string
+	RootURLPattern  string
+	UseRelativeRoot bool
 }
 
 var Current = &Config{}

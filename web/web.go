@@ -12,6 +12,7 @@ import (
 	"time"
 
 	"github.com/aaaasmile/live-blog/conf"
+	"github.com/aaaasmile/live-blog/util"
 	"github.com/aaaasmile/live-blog/web/live"
 )
 
@@ -20,6 +21,8 @@ func RunService(configfile string) {
 	conf.ReadConfig(configfile)
 	log.Println("Configuration is read")
 
+	util.UseRelativeRoot = conf.Current.UseRelativeRoot
+
 	var wait time.Duration
 	serverurl := conf.Current.ServiceURL
 	finalServURL := fmt.Sprintf("http://%s%s", strings.Replace(serverurl, "0.0.0.0", "localhost", 1), conf.Current.RootURLPattern)
@@ -27,7 +30,7 @@ func RunService(configfile string) {
 	log.Println("Server started with URL ", serverurl)
 	log.Println("Try this url: ", finalServURL)
 
-	http.Handle(conf.Current.RootURLPattern+"static/", http.StripPrefix(conf.Current.RootURLPattern+"static", http.FileServer(http.Dir("static"))))
+	http.Handle(conf.Current.RootURLPattern+"static/", http.StripPrefix(conf.Current.RootURLPattern+"static", http.FileServer(http.Dir(util.GetFullPath("static")))))
 	http.HandleFunc(conf.Current.RootURLPattern, live.APiHandler)
 
 	srv := &http.Server{
