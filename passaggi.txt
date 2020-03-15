@@ -4,12 +4,18 @@ IolVienna, service in go che usa la porta 5568
 
 Per LiveBlog direi di usare la porta 5546
 
-
 == Compilare per linux
 Apri una nuova powershell e poi:
 $env:GOOS = "linux"
 go build -o live-blog.bin
 Con WLC si può controllare che il live-blog.bin funziona correttamente.
+
+== Aggiornare il service
+- Crea una nuova versione (cambio in idl.go)
+- Crea il file live-blog.bin per linux 
+- Usa .\deploy -target invido
+- In WLC lancia ./copy_app_to_invido.sh
+- Su invido: ./update-seervice.sh
 
 == Deployment di live.invido.it
 Per prima cosa aggiornare il DNS aggiungendo live.invido.it
@@ -24,19 +30,26 @@ sudo nginx -t
 Ora un restart:
 sudo systemctl restart nginx
 
-Su invido.it poi si aggiorna il certificato (NOTA se questo step si fa prima di enable e available, certbot va a modificare il file default e 
-il sito live.invido.it non funziona più con "nginx: [warn] conflicting server name "live.invido.it" on [::]:443, ignored". Qui bisogna modificare il file default):
+Su invido.it poi si aggiorna il certificato (NOTA se questo step si fa prima di nginx enable e available, certbot va a modificare il file default e 
+il sito live.invido.it non funziona. Errore "nginx: [warn] conflicting server name "live.invido.it" on [::]:443, ignored". 
+Qui bisogna modificare il file default cancellando il redirect del sito live su invido.it):
 sudo certbot --nginx -d <lista di tutti i domini> -d live.invido.it
-Alla scelta scegliere [1], non modificare nginx
+Alla scelta scegliere [1], non modificare nginx (anche se come messo sopra, certbot va a cambiare il file di default)
 
 Ora va installata la app. Uso la dir:
-~/app/go$mkdir live-blog
-~/app/go$mkdir live-blog\current
 ~/app/go$mkdir live-blog\zips
-~/app/go$mkdir live-blog\old
-Ora con lo zip nella cartella zips si esegue:
-unzip ./zips/LiveBlog_00-01-01-20200315-00_15032020-163145_invido.zip  -d ./current/
-chmod +x ./current/live-blog.bin
+copio lo zip deployed locale in live-blog\zips con ./copy_app_to_invido.sh
+copio ./update-service.sh in ~/app/go/live-blog e lo lancio per scompattare lo zip nella dir ./current
+Poi si va ./current e si prova il service con: ./live-blog.bin
 
+Poi si mette il programma live-blog.bin come service di sistema.
+sudo nano /lib/systemd/system/live-blog.service
+Si mette tutto il necessario che non sto qui a riportare (readme_hetzner)
+Abilitare il service:
+sudo systemctl enable live-blog.service
+Ora si fa partire il service (resistente al reboot):
+sudo systemctl start live-blog
+Per vedere i logs si usa:
+sudo journalctl -f -u live-blog
 
 
