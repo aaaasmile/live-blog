@@ -87,7 +87,7 @@ func (uc *UserCred) CredFromFile() error {
 		PasswordHash string
 	}{}
 
-	err = json.NewDecoder(f).Decode(cred)
+	err = json.NewDecoder(f).Decode(&cred)
 	uc.UserName = cred.UserName
 	uc.PasswordHash = cred.PasswordHash
 	return err
