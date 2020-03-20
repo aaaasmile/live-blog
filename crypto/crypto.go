@@ -1,15 +1,22 @@
 package crypto
 
 import (
+	"crypto/rand"
 	"encoding/json"
 	"fmt"
+	"io"
 	"log"
 	"os"
+	"runtime"
+	"time"
+
+	"golang.org/x/crypto/argon2"
 )
 
 type UserCred struct {
 	UserName     string
 	PasswordHash string
+	Salt         string
 	CredFile     string
 }
 
@@ -43,9 +50,11 @@ func (uc *UserCred) saveCredential() error {
 	cred := struct {
 		UserName     string
 		PasswordHash string
+		Salt         string
 	}{
 		UserName:     uc.UserName,
 		PasswordHash: uc.PasswordHash,
+		Salt:         uc.Salt,
 	}
 
 	return json.NewEncoder(f).Encode(cred)
@@ -69,8 +78,12 @@ func (uc *UserCred) credFromPrompt() error {
 		return fmt.Errorf("Passowrd confirm is different")
 	}
 
+	salt := make([]byte, 32)
+	io.ReadFull(rand.Reader, salt)
+
 	uc.UserName = user
-	uc.PasswordHash = pwd
+	uc.PasswordHash = hashPassword(pwd, salt)
+	uc.Salt = fmt.Sprintf("%x", salt)
 
 	return nil
 }
@@ -85,10 +98,19 @@ func (uc *UserCred) CredFromFile() error {
 	cred := struct {
 		UserName     string
 		PasswordHash string
+		Salt         string
 	}{}
 
 	err = json.NewDecoder(f).Decode(&cred)
 	uc.UserName = cred.UserName
 	uc.PasswordHash = cred.PasswordHash
 	return err
+}
+
+func hashPassword(pwd string, salt []byte) string {
+	ram := 512 * 1024
+	t0 := time.Now()
+	key := argon2.IDKey([]byte(pwd), salt, 1, uint32(ram), uint8(runtime.NumCPU()<<1), 32)
+	log.Printf("hash time: %v, key: %x\n", time.Since(t0), key)
+	return fmt.Sprintf("%x", key)
 }
