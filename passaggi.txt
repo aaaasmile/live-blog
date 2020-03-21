@@ -52,4 +52,9 @@ sudo systemctl start live-blog
 Per vedere i logs si usa:
 sudo journalctl -f -u live-blog
 
+== Usare il live service
+Per prima cosa va creato un account, per esempio admin. Live supporta un solo account.
+Esso va creato a liene di comando.  Per cambiare le credential bisogna cancellare il file json.
+
+
 

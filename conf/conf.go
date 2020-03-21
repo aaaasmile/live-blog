@@ -12,6 +12,7 @@ type Config struct {
 	ServiceURL      string
 	RootURLPattern  string
 	UseRelativeRoot bool
+	DebugVerbose    bool
 	UserCred        *crypto.UserCred
 }
 
