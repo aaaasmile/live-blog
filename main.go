@@ -34,5 +34,5 @@ func main() {
 		log.Fatal("Credential error. Please make sure that an account has been initiated. Error is: ", err)
 	}
 
-	web.RunService(*configfile)
+	web.RunService(*configfile, uc)
 }

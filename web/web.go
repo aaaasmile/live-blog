@@ -12,13 +12,14 @@ import (
 	"time"
 
 	"github.com/aaaasmile/live-blog/conf"
+	"github.com/aaaasmile/live-blog/crypto"
 	"github.com/aaaasmile/live-blog/util"
 	"github.com/aaaasmile/live-blog/web/live"
 )
 
-func RunService(configfile string) {
+func RunService(configfile string, uc *crypto.UserCred) {
 
-	conf.ReadConfig(configfile)
+	conf.ReadConfig(configfile, uc)
 	log.Println("Configuration is read")
 
 	util.UseRelativeRoot = conf.Current.UseRelativeRoot

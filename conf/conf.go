@@ -5,17 +5,19 @@ import (
 	"os"
 
 	"github.com/BurntSushi/toml"
+	"github.com/aaaasmile/live-blog/crypto"
 )
 
 type Config struct {
 	ServiceURL      string
 	RootURLPattern  string
 	UseRelativeRoot bool
+	UserCred        *crypto.UserCred
 }
 
 var Current = &Config{}
 
-func ReadConfig(configfile string) *Config {
+func ReadConfig(configfile string, uc *crypto.UserCred) *Config {
 	_, err := os.Stat(configfile)
 	if err != nil {
 		log.Fatal(err)
@@ -23,5 +25,6 @@ func ReadConfig(configfile string) *Config {
 	if _, err := toml.DecodeFile(configfile, &Current); err != nil {
 		log.Fatal(err)
 	}
+	Current.UserCred = uc
 	return Current
 }
