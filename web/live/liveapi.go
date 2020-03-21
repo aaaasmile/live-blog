@@ -1,6 +1,7 @@
 package live
 
 import (
+	"encoding/json"
 	"fmt"
 	"html/template"
 	"io/ioutil"
@@ -12,11 +13,17 @@ import (
 
 	"github.com/aaaasmile/live-blog/conf"
 	"github.com/aaaasmile/live-blog/web/idl"
+	"github.com/aaaasmile/live-blog/web/session"
 )
 
 type PageCtx struct {
 	RootUrl string
 	Buildnr string
+}
+
+type ResponseData struct {
+	Info       string
+	ResultCode int
 }
 
 func getURLForRoute(uri string) string {
@@ -80,6 +87,52 @@ func handleLogin(w http.ResponseWriter, req *http.Request) error {
 		log.Println(string(rawbody))
 	}
 
+	cred := struct {
+		Username string
+		Password string
+	}{}
+	if err := json.Unmarshal(rawbody, &cred); err != nil {
+		return err
+	}
+	log.Println("Login for user ", cred.Username)
+
+	session, err := session.SessMgr.GetSession(w, req)
+	if err != nil {
+		return err
+	}
+
+	if session.Username == cred.Username {
+		return loginResult(200, w)
+	}
+
+	loginResult(403, w)
+
+	return nil
+}
+
+func loginResult(resultCode int, w http.ResponseWriter) error {
+	resp := ResponseData{
+		ResultCode: resultCode,
+	}
+
+	switch resultCode {
+	case 200:
+		resp.Info = fmt.Sprintf("User login OK")
+	case 403:
+		resp.Info = fmt.Sprintf("User Unauthorized")
+	default:
+		resp.Info = fmt.Sprintf("User login ERROR")
+	}
+
+	return writeResponse(w, &resp)
+}
+
+func writeResponse(w http.ResponseWriter, resp *ResponseData) error {
+	blobresp, err := json.Marshal(resp)
+	if err != nil {
+		return err
+	}
+	w.Write(blobresp)
 	return nil
 }
 

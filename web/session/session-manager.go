@@ -13,7 +13,7 @@ import (
 )
 
 var (
-	sessMgr = &SessionManager{
+	SessMgr = &SessionManager{
 		cookieName:  "LiveBlogCookie",
 		sessionsWS:  make(map[string]*SessionCtx),
 		maxlifetime: 3600 * 24, // Max session life in seconds
@@ -22,6 +22,7 @@ var (
 
 type SessionCtx struct {
 	ID        string
+	Username  string
 	CreatedAt time.Time
 }
 
@@ -58,6 +59,7 @@ func (manager *SessionManager) GetSession(w http.ResponseWriter, r *http.Request
 	var ok bool
 	if session, ok = manager.sessionsWS[sn]; !ok {
 		session = &SessionCtx{
+			ID:        sn,
 			CreatedAt: time.Now(),
 		}
 		manager.sessionsWS[sn] = session
@@ -91,5 +93,5 @@ func (manager *SessionManager) GC() {
 }
 
 func init() {
-	go sessMgr.GC()
+	go SessMgr.GC()
 }
