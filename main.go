@@ -24,7 +24,7 @@ func main() {
 
 	uc := crypto.NewUserCred()
 	if *initAccount {
-		if err := uc.CreateAdminCredentials(); err != nil {
+		if err := uc.CreateAccountCredentials(); err != nil {
 			log.Fatal("Error: ", err)
 		}
 		log.Println("Credential successfully created. Please restart.")

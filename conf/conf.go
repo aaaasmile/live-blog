@@ -27,5 +27,6 @@ func ReadConfig(configfile string, uc *crypto.UserCred) *Config {
 		log.Fatal(err)
 	}
 	Current.UserCred = uc
+	log.Println("User configured: ", Current.UserCred.String())
 	return Current
 }

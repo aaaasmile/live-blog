@@ -2,6 +2,7 @@ package crypto
 
 import (
 	"crypto/rand"
+	"encoding/base64"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -27,7 +28,7 @@ func NewUserCred() *UserCred {
 	return &res
 }
 
-func (uc *UserCred) CreateAdminCredentials() error {
+func (uc *UserCred) CreateAccountCredentials() error {
 	err := uc.CredFromFile()
 	if err != nil {
 		log.Println("Missed od malformed credential: ", err)
@@ -64,7 +65,7 @@ func (uc *UserCred) credFromPrompt() error {
 	var user, pwd, pwdcfm string
 	fmt.Println("Please enter the username")
 	fmt.Scanln(&user)
-	//fmt.Println("*** user: ", []byte(user))
+	//fmt.Println("*** user: ", user)
 
 	fmt.Println("Please enter the password")
 	fmt.Scanln(&pwd)
@@ -82,8 +83,9 @@ func (uc *UserCred) credFromPrompt() error {
 	io.ReadFull(rand.Reader, salt)
 
 	uc.UserName = user
+	//fmt.Println("*** pwd: ", pwd)
 	uc.PasswordHash = hashPassword(pwd, salt)
-	uc.Salt = fmt.Sprintf("%x", salt)
+	uc.Salt = base64.StdEncoding.EncodeToString(salt)
 
 	return nil
 }
@@ -104,13 +106,25 @@ func (uc *UserCred) CredFromFile() error {
 	err = json.NewDecoder(f).Decode(&cred)
 	uc.UserName = cred.UserName
 	uc.PasswordHash = cred.PasswordHash
+	uc.Salt = cred.Salt
 	return err
+}
+
+func (uc *UserCred) String() string {
+	return fmt.Sprintf("Username: %s, Hash: %s, Salt %s", uc.UserName, uc.PasswordHash, uc.Salt)
 }
 
 func hashPassword(pwd string, salt []byte) string {
 	ram := 512 * 1024
 	t0 := time.Now()
+	//fmt.Printf("*** salt is %x\n", salt)
+	//fmt.Printf("*** password is %s\n", pwd)
 	key := argon2.IDKey([]byte(pwd), salt, 1, uint32(ram), uint8(runtime.NumCPU()<<1), 32)
-	log.Printf("hash time: %v, key: %x\n", time.Since(t0), key)
+	log.Printf("hash time: %v, key: %x, salt: %x\n", time.Since(t0), key, salt)
 	return fmt.Sprintf("%x", key)
+}
+
+func GetHashOfSecret(pwd, salt string) string {
+	ss, _ := base64.StdEncoding.DecodeString(salt)
+	return hashPassword(pwd, ss)
 }

@@ -12,6 +12,7 @@ import (
 	"time"
 
 	"github.com/aaaasmile/live-blog/conf"
+	"github.com/aaaasmile/live-blog/crypto"
 	"github.com/aaaasmile/live-blog/web/idl"
 	"github.com/aaaasmile/live-blog/web/session"
 )
@@ -19,11 +20,6 @@ import (
 type PageCtx struct {
 	RootUrl string
 	Buildnr string
-}
-
-type ResponseData struct {
-	Info       string
-	ResultCode int
 }
 
 func getURLForRoute(uri string) string {
@@ -84,40 +80,61 @@ func handleLogin(w http.ResponseWriter, req *http.Request) error {
 		return err
 	}
 	if conf.Current.DebugVerbose {
-		log.Println(string(rawbody))
+		log.Println("Request: ", string(rawbody))
 	}
 
-	cred := struct {
+	credReq := struct {
 		Username string
 		Password string
 	}{}
-	if err := json.Unmarshal(rawbody, &cred); err != nil {
+	if err := json.Unmarshal(rawbody, &credReq); err != nil {
 		return err
 	}
-	log.Println("Login for user ", cred.Username)
+	log.Println("Login for user ", credReq.Username)
 
 	session, err := session.SessMgr.GetSession(w, req)
 	if err != nil {
 		return err
 	}
 
-	if session.Username == cred.Username {
-		return loginResult(200, w)
+	if session.Username != "" {
+		if session.Username == credReq.Username {
+			return loginResult(210, credReq.Username, w)
+		}
+	} else {
+		refCred := conf.Current.UserCred
+		if credReq.Username == refCred.UserName {
+			log.Println("Check password for user ", credReq.Username)
+			//fmt.Println("*** refcred", refCred)
+			hash := crypto.GetHashOfSecret(credReq.Password, refCred.Salt)
+			//log.Println("Hash is: ", hash)
+			if hash == refCred.PasswordHash {
+				session.Username = credReq.Username
+				return loginResult(200, credReq.Username, w)
+			}
+		}
 	}
 
-	loginResult(403, w)
+	loginResult(403, credReq.Username, w)
 
 	return nil
 }
 
-func loginResult(resultCode int, w http.ResponseWriter) error {
-	resp := ResponseData{
+func loginResult(resultCode int, username string, w http.ResponseWriter) error {
+	resp := struct {
+		Info       string
+		ResultCode int
+		Username   string
+	}{
 		ResultCode: resultCode,
+		Username:   username,
 	}
 
 	switch resultCode {
 	case 200:
 		resp.Info = fmt.Sprintf("User login OK")
+	case 210:
+		resp.Info = fmt.Sprintf("User already logged in")
 	case 403:
 		resp.Info = fmt.Sprintf("User Unauthorized")
 	default:
@@ -127,7 +144,7 @@ func loginResult(resultCode int, w http.ResponseWriter) error {
 	return writeResponse(w, &resp)
 }
 
-func writeResponse(w http.ResponseWriter, resp *ResponseData) error {
+func writeResponse(w http.ResponseWriter, resp interface{}) error {
 	blobresp, err := json.Marshal(resp)
 	if err != nil {
 		return err
