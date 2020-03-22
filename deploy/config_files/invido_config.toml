@@ -3,3 +3,4 @@ ServiceURL = "127.0.0.1:5546"
 RootURLPattern = "/live/"
 UseRelativeRoot = false
 DebugVerbose = false
+UploadDir = "/home/igor/tmp/upload-files"

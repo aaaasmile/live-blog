@@ -155,6 +155,7 @@ func writeResponse(w http.ResponseWriter, resp interface{}) error {
 
 func handleGet(w http.ResponseWriter, req *http.Request) error {
 	u, _ := url.Parse(req.RequestURI)
+	log.Println("GET requested ", u)
 
 	pagectx := PageCtx{
 		RootUrl: conf.Current.RootURLPattern,
@@ -168,6 +169,6 @@ func handleGet(w http.ResponseWriter, req *http.Request) error {
 	if err != nil {
 		return err
 	}
-	log.Println("GET requested ", u)
+
 	return nil
 }

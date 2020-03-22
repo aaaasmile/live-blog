@@ -13,6 +13,7 @@ type Config struct {
 	RootURLPattern  string
 	UseRelativeRoot bool
 	DebugVerbose    bool
+	UploadDir       string
 	UserCred        *crypto.UserCred
 }
 

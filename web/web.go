@@ -32,6 +32,7 @@ func RunService(configfile string, uc *crypto.UserCred) {
 	log.Println("Try this url: ", finalServURL)
 
 	http.Handle(conf.Current.RootURLPattern+"static/", http.StripPrefix(conf.Current.RootURLPattern+"static", http.FileServer(http.Dir(util.GetFullPath("static")))))
+	http.HandleFunc(conf.Current.RootURLPattern+"upload", live.UploadHandler)
 	http.HandleFunc(conf.Current.RootURLPattern, live.APiHandler)
 
 	srv := &http.Server{

@@ -7,3 +7,4 @@ ServiceURL = "127.0.0.1:5546"
 RootURLPattern = "/live/"
 UseRelativeRoot = true
 DebugVerbose = true
+UploadDir = "D:\\scratch\\go-lang\\live-blog\\tmp\\temp-file"
