@@ -1,6 +1,6 @@
 <template>
   <div>
-    <h2>Live Blog</h2>
+    <h2>Login</h2>
     <div>
       <div>
         <label for="username">Username</label>

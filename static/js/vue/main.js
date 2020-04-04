@@ -1,27 +1,38 @@
-import {Login} from './login.js'
-
+import { Login } from './login.js'
+import { Upload } from './upload.js'
 
 const routes = [
-    { path: '/login', component: Login }
+    { path: '/login', component: Login },
+    { path: '/cloud', component: Upload }
 ]
-
-const router = new VueRouter({
-    routes // short for `routes: routes`
-})
 
 export const app = new Vue({
     el: '#app',
-    router,
+    router: new VueRouter({ routes }),
+    vuetify: new Vuetify(),
+    data() {
+        return {
+            Buildnr: ""
+        }
+    },
+    mounted() {
+        this.Buildnr = window.buildnr
+    },
     template: `
-  <div>
+  <v-app>
     <h2>Live Blog</h2>
     <h3>Actions</h3>
     <ul>
-      <li>Login</li>
-      <li>Cloud</li>
+      <li><router-link to="/login">Login</router-link></li>
+      <li><router-link to="/cloud">Cloud</router-link></li>
       <li>Blog live</li>
     </ul>
-  </div>`
+    <router-view></router-view>
+    <div>
+      <p>Buildnr: {{Buildnr}}</p>
+    </div>
+  </v-app>
+`
 })
 
 console.log('Main is here!')
