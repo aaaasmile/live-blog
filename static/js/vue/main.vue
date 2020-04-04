@@ -6,6 +6,7 @@
       <li><router-link to="/login">Login</router-link></li>
       <li><router-link to="/cloud">Cloud</router-link></li>
       <li>Blog live</li>
+      <v-btn @click="Logout">Logout</v-btn>
     </ul>
     <router-view></router-view>
     <div>

@@ -9,12 +9,13 @@ import (
 )
 
 type Config struct {
-	ServiceURL      string
-	RootURLPattern  string
-	UseRelativeRoot bool
-	DebugVerbose    bool
-	UploadDir       string
-	AdminCred       *crypto.UserCred
+	ServiceURL        string
+	RootURLPattern    string
+	UseRelativeRoot   bool
+	DebugVerbose      bool
+	UploadDir         string
+	PrivatSecretFname string
+	AdminCred         *crypto.UserCred
 }
 
 var Current = &Config{}

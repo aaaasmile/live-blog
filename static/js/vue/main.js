@@ -12,11 +12,24 @@ export const app = new Vue({
     vuetify: new Vuetify(),
     data() {
         return {
-            Buildnr: ""
+            Buildnr: "",
+            username: ""
         }
     },
     mounted() {
         this.Buildnr = window.buildnr
+    },
+    methods:{
+        Logout () {
+            console.log('Execute logout.')
+            let req = { Username: this.username}
+            this.$http.post("Logout", JSON.stringify(req), { headers: { "content-type": "application/json" } }).then(result => {
+              this.response = "Status: " + result.data.Status + "\n";
+              console.log('Call terminated ', result.data)
+            }, error => {
+              console.error(error);
+            });
+          }
     },
     template: `
   <v-app>
@@ -26,6 +39,7 @@ export const app = new Vue({
       <li><router-link to="/login">Login</router-link></li>
       <li><router-link to="/cloud">Cloud</router-link></li>
       <li>Blog live</li>
+      <v-btn @click="Logout">Logout</v-btn>
     </ul>
     <router-view></router-view>
     <div>
