@@ -1,3 +1,5 @@
+import api from "./apicaller.js"
+
 export const SignIn = Vue.component('signin', {
   data() {
     return {
@@ -10,12 +12,12 @@ export const SignIn = Vue.component('signin', {
     SignIn: function (event) {
       console.log('Execute request auth token (Sign In).')
       let req = { Username: this.username, Password: this.password }
-      this.$http.post("Token", JSON.stringify(req), { headers: { "content-type": "application/json" } }).then(result => {
-        this.response = "Status: " + result.data.Status + "\n";
-        console.log('Call terminated ', result.data)
-      }, error => {
-        console.error(error);
-      });
+      api.CallTokenRequest(this, req)
+    },
+    RefreshToken() {
+      console.log('Refresh token.')
+      let req = { Token: localStorage.token_refresh }
+      api.CallTokenRequest(this, req)
     }
   },
   template: `
@@ -48,8 +50,10 @@ export const SignIn = Vue.component('signin', {
           </v-col>
         </v-row>
          <v-btn class="mr-4" v-on:click="SignIn">Sign In</v-btn>
+         <v-btn class="mr-4" v-on:click="RefreshToken">Refresh Token</v-btn>
       </v-container>
      
     </v-form>
-  </div>`
+  </div>
+`
 })

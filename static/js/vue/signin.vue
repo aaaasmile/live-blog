@@ -28,6 +28,7 @@
           </v-col>
         </v-row>
          <v-btn class="mr-4" v-on:click="SignIn">Sign In</v-btn>
+         <v-btn class="mr-4" v-on:click="RefreshToken">Refresh Token</v-btn>
       </v-container>
      
     </v-form>

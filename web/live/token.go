@@ -16,7 +16,7 @@ func handleToken(w http.ResponseWriter, req *http.Request) error {
 	if err != nil {
 		return err
 	}
-	//fmt.Println("*** Request: ", string(rawbody)) do not log passwords
+	fmt.Println("*** Request: ", string(rawbody)) //do not log passwords
 
 	credReq := struct {
 		Username string
