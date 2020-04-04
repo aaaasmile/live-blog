@@ -14,12 +14,12 @@ type Config struct {
 	UseRelativeRoot bool
 	DebugVerbose    bool
 	UploadDir       string
-	UserCred        *crypto.UserCred
+	AdminCred       *crypto.UserCred
 }
 
 var Current = &Config{}
 
-func ReadConfig(configfile string, uc *crypto.UserCred) *Config {
+func ReadConfig(configfile string, ac *crypto.UserCred) *Config {
 	_, err := os.Stat(configfile)
 	if err != nil {
 		log.Fatal(err)
@@ -27,7 +27,7 @@ func ReadConfig(configfile string, uc *crypto.UserCred) *Config {
 	if _, err := toml.DecodeFile(configfile, &Current); err != nil {
 		log.Fatal(err)
 	}
-	Current.UserCred = uc
-	log.Println("User configured: ", Current.UserCred.String())
+	Current.AdminCred = ac
+	log.Println("User configured: ", Current.AdminCred.String())
 	return Current
 }

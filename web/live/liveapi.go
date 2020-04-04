@@ -98,11 +98,11 @@ func handleLogin(w http.ResponseWriter, req *http.Request) error {
 	}
 
 	if session.Username != "" {
-		if session.Username == credReq.Username {
+		if session.Username == credReq.Username { // only one user is supported
 			return loginResult(210, credReq.Username, w)
 		}
 	} else {
-		refCred := conf.Current.UserCred
+		refCred := conf.Current.AdminCred
 		if credReq.Username == refCred.UserName {
 			log.Println("Check password for user ", credReq.Username)
 			//fmt.Println("*** refcred", refCred)

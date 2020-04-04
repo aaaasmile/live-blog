@@ -28,7 +28,7 @@ func NewUserCred() *UserCred {
 	return &res
 }
 
-func (uc *UserCred) CreateAccountCredentials() error {
+func (uc *UserCred) CreateAdminCredentials() error {
 	err := uc.CredFromFile()
 	if err != nil {
 		log.Println("Missed od malformed credential: ", err)
@@ -63,7 +63,7 @@ func (uc *UserCred) saveCredential() error {
 
 func (uc *UserCred) credFromPrompt() error {
 	var user, pwd, pwdcfm string
-	fmt.Println("Please enter the username")
+	fmt.Println("Please enter the username for administrator")
 	fmt.Scanln(&user)
 	//fmt.Println("*** user: ", user)
 

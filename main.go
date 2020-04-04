@@ -22,17 +22,17 @@ func main() {
 		os.Exit(0)
 	}
 
-	uc := crypto.NewUserCred()
+	ac := crypto.NewUserCred()
 	if *initAccount {
-		if err := uc.CreateAccountCredentials(); err != nil {
+		if err := ac.CreateAdminCredentials(); err != nil {
 			log.Fatal("Error: ", err)
 		}
-		log.Println("Credential successfully created. Please restart.")
+		log.Println("Credential for admin successfully created. Please restart.")
 		os.Exit(0)
 	}
-	if err := uc.CredFromFile(); err != nil {
+	if err := ac.CredFromFile(); err != nil {
 		log.Fatal("Credential error. Please make sure that an account has been initiated. Error is: ", err)
 	}
 
-	web.RunService(*configfile, uc)
+	web.RunService(*configfile, ac)
 }
