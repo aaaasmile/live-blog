@@ -3,7 +3,7 @@ export const SignIn = Vue.component('signin', {
     return {
       username: '',
       password: '',
-      show2: false
+      showPsw: false
     }
   },
   methods: {
@@ -35,23 +35,21 @@ export const SignIn = Vue.component('signin', {
           </v-col>
           <v-col cols="12" sm="6" md="3">
             <v-text-field
-              :append-icon="show2 ? 'visibility' : 'visibility_off'"
-              :type="show2 ? 'text' : 'password'"
+              :append-icon="showPsw ? 'visibility' : 'visibility_off'"
+              :type="showPsw ? 'text' : 'password'"
               name="password"
               id="password"
               v-model="password"
               label="Password"
               hint="At least 6 characters"
               class="input-group--focused"
-              @click:append="show2 = !show2"
+              @click:append="showPsw = !showPsw"
             ></v-text-field>
           </v-col>
         </v-row>
+         <v-btn class="mr-4" v-on:click="SignIn">Sign In</v-btn>
       </v-container>
+     
     </v-form>
-    <v-btn fab dark small depressed color="purple">
-      <v-icon dark>visibility</v-icon>
-    </v-btn>
-    <v-btn v-on:click="SignIn">Sign In</v-btn>
   </div>`
 })
