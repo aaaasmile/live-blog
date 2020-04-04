@@ -6,10 +6,10 @@ export const Login = Vue.component('login', {
     }
   },
   methods: {
-    Login: function (event) {
-      console.log('Execute login.')
+    SignIn: function (event) {
+      console.log('Execute request auth token (Sign In).')
       let req = { Username: this.username, Password: this.password }
-      this.$http.post("Login", JSON.stringify(req), { headers: { "content-type": "application/json" } }).then(result => {
+      this.$http.post("Token", JSON.stringify(req), { headers: { "content-type": "application/json" } }).then(result => {
         this.response = "Status: " + result.data.Status + "\n";
         console.log('Call terminated ', result.data)
       }, error => {
@@ -19,7 +19,7 @@ export const Login = Vue.component('login', {
   },
   template: `
   <div>
-    <h2>Login</h2>
+    <h2>Sign In with OAuth</h2>
     <div>
       <div>
         <label for="username">Username</label>
@@ -29,7 +29,8 @@ export const Login = Vue.component('login', {
         <label for="password">Password</label>
         <input id="password" v-model="password" type="password" name="password" />
       </div>
-      <button v-on:click="Login">Login</button>
+      <button v-on:click="SignIn">Sign In</button>
     </div>
-  </div>`
+  </div>
+`
 })

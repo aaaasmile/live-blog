@@ -1,6 +1,6 @@
 <template>
   <div>
-    <h2>Login</h2>
+    <h2>Sign In with OAuth</h2>
     <div>
       <div>
         <label for="username">Username</label>
@@ -10,7 +10,7 @@
         <label for="password">Password</label>
         <input id="password" v-model="password" type="password" name="password" />
       </div>
-      <button v-on:click="Login">Login</button>
+      <button v-on:click="SignIn">Sign In</button>
     </div>
   </div>
 </template>

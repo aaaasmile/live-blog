@@ -56,9 +56,11 @@ func handlePost(w http.ResponseWriter, req *http.Request) error {
 	log.Println("Check the last path ", lastPath)
 	switch lastPath {
 	case "Login":
-		err = handleLogin(w, req)
+		err = handleLogin(w, req) // TODO: session with login should be obsolete
 	case "Logout":
-		err = handleLogout(w, req)
+		err = handleLogout(w, req) // TODO: session with login should be obsolete
+	case "Token":
+		err = handleToken(w, req)
 	default:
 		return fmt.Errorf("%s method is not supported", lastPath)
 	}

@@ -12,6 +12,9 @@ import (
 	"time"
 )
 
+// NOTE: vorrei memorizzare i dati relativi alla session sul client. Quindi SessionManager dovrebbe diventare obsoleto.
+// Al momento con login/logout non lo è.
+
 var (
 	SessMgr = &SessionManager{
 		cookieName:  "LiveBlogCookie",

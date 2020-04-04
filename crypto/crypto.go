@@ -31,10 +31,11 @@ type UserCred struct {
 }
 
 type Token struct {
-	AccessToken  string `json:access_token`
-	RefreshToken string `json:refresh_token`
-	TokenType    string `json:token_type`
-	Expire       string `json:expiry`
+	AccessToken   string `json:"access_token"`
+	RefreshToken  string `json:"refresh_token"`
+	TokenType     string `json:"token_type"`
+	Expire        string `json:"expiry"`
+	RefreshExpire string `json:"refresh_expiry"`
 }
 
 func NewUserCred() *UserCred {
@@ -186,8 +187,23 @@ func (uc *UserCred) GetJWTToken(user string, expInSec int, resTk *Token) error {
 	}
 	resTk.AccessToken = tk
 	resTk.TokenType = "token_type"
-	resTk.Expire = time.Now().Add(duration).Format(time.RFC3339)
-	// TODO resTk.RefreshToken
+	resTk.Expire = exp.Format(time.RFC3339)
+	//RefreshToken
+	duration, err = time.ParseDuration(fmt.Sprintf("%ds", 3600*24*7))
+	if err != nil {
+		return err
+	}
+	exp = exp.Add(duration)
+	claims["aud"] = "auth"
+	claims["exp"] = exp.Unix()
+	token = jwt.NewWithClaims(jwt.SigningMethodRS256, claims)
+	tk, err = token.SignedString(mySigningKey)
+	if err != nil {
+		return err
+	}
+	resTk.RefreshToken = tk
+	resTk.RefreshExpire = exp.Format(time.RFC3339)
+
 	return nil
 
 }

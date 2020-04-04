@@ -17,9 +17,7 @@ func handleLogin(w http.ResponseWriter, req *http.Request) error {
 	if err != nil {
 		return err
 	}
-	if conf.Current.DebugVerbose {
-		log.Println("Request: ", string(rawbody))
-	}
+	//fmt.Println("*** Request: ", string(rawbody)) do not log passwords
 
 	credReq := struct {
 		Username string
