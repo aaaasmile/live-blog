@@ -1,6 +1,6 @@
 <template>
   <div>
-    <h2>Sign In with OAuth</h2>
+    <h2>Sign In</h2>
     <div>
       <div>
         <label for="username">Username</label>

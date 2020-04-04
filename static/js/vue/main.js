@@ -1,4 +1,4 @@
-import { Login } from './login.js'
+import { Login } from './signin.js'
 import { Upload } from './upload.js'
 
 const routes = [
@@ -12,24 +12,14 @@ export const app = new Vue({
     vuetify: new Vuetify(),
     data() {
         return {
-            Buildnr: "",
-            username: ""
+            Buildnr: ""
         }
     },
     mounted() {
         this.Buildnr = window.buildnr
     },
     methods:{
-        Logout () {
-            console.log('Execute logout.')
-            let req = { Username: this.username}
-            this.$http.post("Logout", JSON.stringify(req), { headers: { "content-type": "application/json" } }).then(result => {
-              this.response = "Status: " + result.data.Status + "\n";
-              console.log('Call terminated ', result.data)
-            }, error => {
-              console.error(error);
-            });
-          }
+    
     },
     template: `
   <v-app>
@@ -44,7 +34,8 @@ export const app = new Vue({
     <div>
       <p>Buildnr: {{Buildnr}}</p>
     </div>
-  </v-app>`
+  </v-app>
+`
 })
 
 console.log('Main is here!')
