@@ -60,7 +60,8 @@ func procUpload(w http.ResponseWriter, req *http.Request) error {
 
 	// Create a temporary file within our temp-images directory that follows
 	// a particular naming pattern
-	tempFile, err := ioutil.TempFile(conf.Current.UploadDir, "upload-*.txt")
+	now := time.Now()
+	tempFile, err := ioutil.TempFile(conf.Current.UploadDir, fmt.Sprintf("%s-*", now.Format("2006-01-02")))
 	if err != nil {
 		return err
 	}
