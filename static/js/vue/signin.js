@@ -35,7 +35,7 @@ export const SignIn = Vue.component('signin', {
           </v-col>
           <v-col cols="12" sm="6" md="3">
             <v-text-field
-              :append-icon="show2 ? 'mdi-eye' : 'mdi-eye-off'"
+              :append-icon="show2 ? 'visibility' : 'visibility_off'"
               :type="show2 ? 'text' : 'password'"
               name="password"
               id="password"
@@ -49,7 +49,9 @@ export const SignIn = Vue.component('signin', {
         </v-row>
       </v-container>
     </v-form>
-    <v-icon dark>folder_open</v-icon>
+    <v-btn fab dark small depressed color="purple">
+      <v-icon dark>visibility</v-icon>
+    </v-btn>
     <v-btn v-on:click="SignIn">Sign In</v-btn>
   </div>`
 })

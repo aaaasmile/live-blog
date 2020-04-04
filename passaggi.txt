@@ -62,5 +62,7 @@ Le richieste avvengono via rest con auth token.
 Questo quello che si dovrebbe fare coi token:
 3) The client (Front end) will store refresh token in his local storage and access token in cookies.
 
-
+== Vuetify e Icon materialize
+Il riferimento per le icons: https://materializecss.com/icons.html
+Il riferimento per i componenti: https://vuetifyjs.com/en/components/text-fields/
 
