@@ -66,3 +66,8 @@ Questo quello che si dovrebbe fare coi token:
 Il riferimento per le icons: https://materializecss.com/icons.html
 Il riferimento per i componenti: https://vuetifyjs.com/en/components/text-fields/
 
+
+== Chiave pubblica
+Per validare il token jwt occorre la chiave pubblica
+openssl rsa -in key.pem -pubout -out pubkey.pem
+

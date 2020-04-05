@@ -26,8 +26,11 @@ type UserCred struct {
 	Salt         string
 	CredFile     string
 	PemFile      string
+	PubPemfile   string
 	SecretPem    string
 	RsaLen       int
+	MySigningKey *rsa.PrivateKey
+	MyPubKey     *rsa.PublicKey
 }
 
 type Token struct {
@@ -40,9 +43,10 @@ type Token struct {
 
 func NewUserCred() *UserCred {
 	res := UserCred{
-		CredFile: "./cert/cred.json",
-		PemFile:  "./cert/key.pem",
-		RsaLen:   1024,
+		CredFile:   "./cert/cred.json",
+		PemFile:    "./cert/key.pem",
+		PubPemfile: "./cert/pubkey.pem",
+		RsaLen:     1024,
 	}
 	return &res
 }
@@ -156,10 +160,22 @@ func (uc *UserCred) CredFromFile() error {
 	return err
 }
 
+func (uc *UserCred) fetchPrivateRsaKey() error {
+	if uc.MySigningKey == nil {
+		mySigningKey, err := privateKeyFromPemFile(util.GetFullPath(uc.PemFile), uc.SecretPem)
+		if err != nil {
+			return err
+		}
+		uc.MySigningKey = mySigningKey
+	}
+
+	return nil
+}
+
 func (uc *UserCred) GetJWTToken(user string, expInSec int, resTk *Token) error {
 	log.Println("Using key: ", uc.PemFile)
 
-	mySigningKey, err := privateKeyFromPemFile(util.GetFullPath(uc.PemFile), uc.SecretPem)
+	err := uc.fetchPrivateRsaKey()
 	if err != nil {
 		return err
 	}
@@ -181,7 +197,7 @@ func (uc *UserCred) GetJWTToken(user string, expInSec int, resTk *Token) error {
 	token := jwt.NewWithClaims(jwt.SigningMethodRS256, claims)
 	//log.Println("Signing key: ", mySigningKey)
 	//tk, err := token.SigningString()
-	tk, err := token.SignedString(mySigningKey)
+	tk, err := token.SignedString(uc.MySigningKey)
 	if err != nil {
 		return err
 	}
@@ -194,10 +210,14 @@ func (uc *UserCred) GetJWTToken(user string, expInSec int, resTk *Token) error {
 		return err
 	}
 	exp = exp.Add(duration)
-	claims["aud"] = "auth"
-	claims["exp"] = exp.Unix()
-	token = jwt.NewWithClaims(jwt.SigningMethodRS256, claims)
-	tk, err = token.SignedString(mySigningKey)
+
+	claims2 := jwt.MapClaims{
+		"sub": user,
+		"exp": exp.Unix(),
+		"aud": "auth",
+	}
+	token = jwt.NewWithClaims(jwt.SigningMethodRS256, claims2)
+	tk, err = token.SignedString(uc.MySigningKey)
 	if err != nil {
 		return err
 	}
@@ -206,6 +226,58 @@ func (uc *UserCred) GetJWTToken(user string, expInSec int, resTk *Token) error {
 
 	return nil
 
+}
+
+func (uc *UserCred) ParseJwtToken(tokenString string) (string, error) {
+	if uc.MyPubKey == nil {
+		rawdata, err := ioutil.ReadFile(util.GetFullPath(uc.PubPemfile))
+		if err != nil {
+			return "", err
+		}
+		pubkey, err := jwt.ParseRSAPublicKeyFromPEM(rawdata)
+		if err != nil {
+			return "", err
+		}
+		uc.MyPubKey = pubkey
+	}
+	// Parse takes the token string and a function for looking up the key. The latter is especially
+	// useful if you use multiple keys for your application.  The standard is to use 'kid' in the
+	// head of the token to identify which key to use, but the parsed token (head and claims) is provided
+	// to the callback, providing flexibility.
+	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
+		// Don't forget to validate the alg is what you expect:
+		if _, ok := token.Method.(*jwt.SigningMethodRSA); !ok {
+			return nil, fmt.Errorf("Unexpected signing method: %v", token.Header["alg"])
+		}
+
+		// hmacSampleSecret is a []byte containing your secret, e.g. []byte("my_secret_key")
+		return uc.MyPubKey, nil
+	})
+
+	if ve, ok := err.(*jwt.ValidationError); ok {
+		if ve.Errors&jwt.ValidationErrorMalformed != 0 {
+			err = fmt.Errorf("That's not even a token")
+		} else if ve.Errors&(jwt.ValidationErrorExpired|jwt.ValidationErrorNotValidYet) != 0 {
+			// Token is either expired or not active yet
+			err = fmt.Errorf("Timing is everything, token is expired")
+		} else {
+			err = fmt.Errorf("Couldn't handle this token: %v", err)
+		}
+	}
+	if err != nil {
+		return "", err
+	}
+
+	if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
+		log.Println("Refresh token claims: ", claims)
+		if claims["aud"] == "auth" {
+			if user, ok := claims["sub"].(string); ok {
+				return user, nil
+			}
+		}
+		err = fmt.Errorf("Token is not valid for refresh")
+	}
+	return "", err
 }
 
 func (uc *UserCred) String() string {

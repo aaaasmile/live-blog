@@ -27,6 +27,17 @@ func handleToken(w http.ResponseWriter, req *http.Request) error {
 	}
 	log.Println("Token for user ", credReq.Username)
 
+	if credReq.Username == "" {
+		log.Println("Username is empty")
+		refrToken := struct {
+			Token string
+		}{}
+		if err := json.Unmarshal(rawbody, &refrToken); err != nil {
+			return err
+		}
+		return checkRefreshToken(w, refrToken.Token)
+	}
+
 	refCred := conf.Current.AdminCred
 	if credReq.Username == refCred.UserName {
 		log.Println("Check password for user ", credReq.Username)
@@ -71,4 +82,25 @@ func tokenResult(resultCode int, username string, w http.ResponseWriter) error {
 	}
 
 	return writeErrorResponse(w, resp.ResultCode, resp)
+}
+
+func checkRefreshToken(w http.ResponseWriter, refrTk string) error {
+
+	if refrTk == "" {
+		return fmt.Errorf("Refresh token is empty")
+	}
+	if len(refrTk) > 10 {
+		b := len(refrTk) - 1
+		a := b - 10
+		log.Println("Check for refresh token ", refrTk[a:b])
+	}
+	refCred := conf.Current.AdminCred
+	user, err := refCred.ParseJwtToken(refrTk)
+	if err != nil {
+		return err
+	}
+	if user != "" {
+		return tokenResult(200, user, w)
+	}
+	return tokenResult(403, user, w)
 }
