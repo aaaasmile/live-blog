@@ -8,9 +8,9 @@ export default {
     }
   },
   template: `
-  <v-card  flat  tile>
+  <nav>
     <v-app-bar dense flat>
-      <v-app-bar-nav-icon></v-app-bar-nav-icon>
+      <v-btn text color="grey"><v-icon>menu</v-icon></v-btn>
       <v-toolbar-title class="text-uppercase grey--text">
         <span class="font-weight-light">Live</span>
         <span>Blog</span>
@@ -21,5 +21,5 @@ export default {
         <v-icon right>exit_to_app</v-icon>
       </v-btn>
     </v-app-bar>
-  </v-card>`
+  </nav>`
 }
