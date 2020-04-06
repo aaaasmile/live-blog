@@ -1,6 +1,6 @@
-import api from "./apicaller.js"
+import api from "../apicaller.js"
 
-export const SignIn = Vue.component('signin', {
+export default {
   data() {
     return {
       username: '',
@@ -56,4 +56,4 @@ export const SignIn = Vue.component('signin', {
     </v-form>
   </div>
 `
-})
+}
