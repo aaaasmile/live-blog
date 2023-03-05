@@ -57,6 +57,8 @@ func handlePost(w http.ResponseWriter, req *http.Request) error {
 	switch lastPath {
 	case "Token":
 		err = handleToken(w, req)
+	case "List":
+		err = handleList(w, req)
 	default:
 		return fmt.Errorf("%s method is not supported", lastPath)
 	}

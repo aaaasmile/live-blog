@@ -21,6 +21,11 @@ Per il Client vorrei avere un tool a linea di comando che esegue:
 - Lista delle risorse sul server
 - Cancellare una risorsa
 
+## API
+
+list: Route API/list, validation: jwt in auth header. Mostra la lista delle risorse.
+
+
 
 ## Compilare per linux
 Apri una nuova powershell e poi:
