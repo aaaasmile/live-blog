@@ -36,41 +36,47 @@ func getURLForRoute(uri string) string {
 
 func APiHandler(w http.ResponseWriter, req *http.Request) {
 	var err error
+	was_auth := false
 	switch req.Method {
 	case "GET":
 		err = handleGet(w, req)
 	case "POST":
 		log.Println("POST on ", req.RequestURI)
-		err = handlePost(w, req)
+		was_auth, err = handlePost(w, req)
 	}
 	if err != nil {
 		log.Println("Error on process request: ", err)
-		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		err_info := "Internal Server Error"
+		if was_auth {
+			err_info = fmt.Sprintf("Internal Server Error: %s", err.Error())
+		}
+		http.Error(w, err_info, http.StatusInternalServerError)
 	}
 }
 
-func handlePost(w http.ResponseWriter, req *http.Request) error {
+func handlePost(w http.ResponseWriter, req *http.Request) (bool, error) {
 	start := time.Now()
 	var err error
+	was_auth := false
 	lastPath := getURLForRoute(req.RequestURI)
 	log.Println("Check the last path ", lastPath)
 	switch lastPath {
 	case "Token":
 		err = handleToken(w, req)
 	case "List":
-		err = handleList(w, req)
+		was_auth, err = handleList(w, req)
 	default:
-		return fmt.Errorf("%s method is not supported", lastPath)
+		return was_auth, fmt.Errorf("%s method is not supported", lastPath)
 	}
 
 	if err != nil {
-		return err
+		return was_auth, err
 	}
 
 	t := time.Now()
 	elapsed := t.Sub(start)
 	log.Printf("Service total call duration: %v\n", elapsed)
-	return nil
+	return was_auth, nil
 }
 
 func writeResponse(w http.ResponseWriter, resp interface{}) error {

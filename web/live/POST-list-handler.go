@@ -2,7 +2,6 @@ package live
 
 import (
 	"encoding/json"
-	"fmt"
 	"io"
 	"log"
 	"net/http"
@@ -13,32 +12,34 @@ import (
 	"github.com/aaaasmile/live-blog/conf"
 )
 
-func handleList(w http.ResponseWriter, req *http.Request) error {
+func handleList(w http.ResponseWriter, req *http.Request) (bool, error) {
 	log.Println("Handle List ", req.Header["Authorization"])
+	was_auth := false
 	user, err := isRequestAuthorized(req)
 	if err != nil {
-		return err
+		return was_auth, err
 	}
 	if user == "" {
-		return writeErrorResponse(w, 403, "")
+		return was_auth, writeErrorResponse(w, 403, "")
 	}
+	was_auth = true
 	log.Println("User is autorized", user)
 
 	rawbody, err := io.ReadAll(req.Body)
 	if err != nil {
-		return err
+		return was_auth, err
 	}
-	fmt.Println("*** Request: ", string(rawbody))
+	//fmt.Println("*** Request: ", string(rawbody))
 
 	reqPayload := struct {
 		Path string
 	}{}
-	if err := json.Unmarshal(rawbody, &req); err != nil {
-		return err
+	if err := json.Unmarshal(rawbody, &reqPayload); err != nil {
+		return was_auth, err
 	}
 	log.Println("List request for ", reqPayload.Path)
-
-	return listResult(reqPayload.Path, w)
+	err = listResult(reqPayload.Path, w)
+	return was_auth, err
 }
 
 type ResType int
@@ -61,7 +62,7 @@ func listResult(reqPath string, w http.ResponseWriter) error {
 	}
 	pp := path.Join(conf.Current.UploadDir, reqPath)
 	targetPath, _ := filepath.Abs(pp)
-	fmt.Println("path is: ", targetPath)
+	log.Println("Path to read is: ", targetPath)
 	files, err := os.ReadDir(targetPath)
 	if err != nil {
 		return err
