@@ -1,23 +1,42 @@
-Le porte su invido.it occupate sono:
-MySmileCv, rails e passenger. Non chiara la porta usata da passenger, credo 3000 o 3001.
-IolVienna, service in go che usa la porta 5568
+# Live-blog
+Uso questo progetto per fare l'upload e il download di file criptati sul server invido.it.
+Una specie di cloud primitiva. Inizialmente avevo pensato questo service per aggiornare il mio sito,
+ma è una funzionalità della quale non ho mai sentito la mancanza.
+Quella, invece, di inviare files da diversi dispositivi sul server e di scaricarli su altri
+è una funzionalità della quale ho bisogno, specialmente in ambienti dove la chiavetta usb non funziona
+più, ma esiste ancora la possibilità di eseguire uploads sul mio server.  
 
-Per LiveBlog direi di usare la porta 5546
+A grandi linee le funzionalità del server sono:
+- Sul server le risorse (in genere files) sono criptate. La chiave privata è sul client.
+- Download di una risorsa così com'è
+- Upload di una risorsa così com'è. Se è lo stessa viene sovrascritta. 
+- Lista delle risorse
+- Cancellare una risorsa
+- Interfaccia web (al momento non necessaria)
 
-== Compilare per linux
+Per il Client vorrei avere un tool a linea di comando che esegue:
+- Criptazione della risorsa con chiave privata del client
+- Upload del file criptato
+- Download del file criptato e decriptazione finale
+- Lista delle risorse sul server
+- Cancellare una risorsa
+
+
+## Compilare per linux
 Apri una nuova powershell e poi:
-$env:GOOS = "linux"
-go build -o live-blog.bin
+
+    $env:GOOS = "linux"
+    go build -o live-blog.bin
 Con WLC si può controllare che il live-blog.bin funziona correttamente.
 
-== Aggiornare il service
+## Aggiornare il service
 - Crea una nuova versione (cambio in idl.go)
 - Crea il file live-blog.bin per linux 
 - Usa .\deploy -target invido
 - In WLC lancia ./copy_app_to_invido.sh
-- Su invido: ./update-seervice.sh
+- Su invido: ./update-service.sh
 
-== Deployment di live.invido.it
+## Deployment di live.invido.it
 Per prima cosa aggiornare il DNS aggiungendo live.invido.it
 Poi bisogna abilitare il reverse proxy con https su nginx. Parto dal file iolvienna:
 /etc/nginx/sites-available$ sudo cp vienna.invido.it  live.invido.it
@@ -52,22 +71,22 @@ sudo systemctl start live-blog
 Per vedere i logs si usa:
 sudo journalctl -f -u live-blog
 
-== Usare il live service
+## Usare il live service
 Per prima cosa va creato un account, per esempio admin. Live supporta un solo account.
 Esso va creato a liene di comando.  Per cambiare le credential bisogna cancellare il file json.
 
-== Sign In
+## Sign In
 Uso il jwt token per il sign in. Non credo sia necessaria una session sul server.
 Le richieste avvengono via rest con auth token.
 Questo quello che si dovrebbe fare coi token:
 3) The client (Front end) will store refresh token in his local storage and access token in cookies.
 
-== Vuetify e Icon materialize
+## Vuetify e Icon materialize
 Il riferimento per le icons: https://materializecss.com/icons.html
 Il riferimento per i componenti: https://vuetifyjs.com/en/components/text-fields/
 
 
-== Chiave pubblica
+## Chiave pubblica
 Per validare il token jwt occorre la chiave pubblica
 openssl rsa -in key.pem -pubout -out pubkey.pem
 
