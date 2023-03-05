@@ -9,6 +9,7 @@ import (
 	"os"
 	"path"
 	"path/filepath"
+	"strings"
 
 	"github.com/aaaasmile/live-blog/conf"
 )
@@ -18,7 +19,10 @@ func handleList(w http.ResponseWriter, req *http.Request) error {
 	user := ""
 	var err error
 	adminCred := conf.Current.AdminCred
-	if tk, ok := req.Header["Authorization"]; ok {
+	auth_tk := req.Header.Get("Authorization")
+	if auth_tk != "" {
+		tk := strings.Split(auth_tk, " ")
+		//fmt.Println("*** ", tk)
 		if len(tk) == 2 {
 			if tk[0] == "Bearer" {
 				user, err = adminCred.ParseJwtToken(tk[1])
@@ -28,6 +32,7 @@ func handleList(w http.ResponseWriter, req *http.Request) error {
 			}
 		}
 	}
+
 	if user == "" {
 		return writeErrorResponse(w, 403, "")
 	}

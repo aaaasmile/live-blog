@@ -21,6 +21,7 @@ func handleToken(w http.ResponseWriter, req *http.Request) error {
 	credReq := struct {
 		Username string
 		Password string
+		UserHash string
 	}{}
 	if err := json.Unmarshal(rawbody, &credReq); err != nil {
 		return err
@@ -42,7 +43,12 @@ func handleToken(w http.ResponseWriter, req *http.Request) error {
 	if credReq.Username == refCred.UserName {
 		log.Println("Check password for user ", credReq.Username)
 		//fmt.Println("*** refcred", refCred)
-		hash := crypto.GetHashOfSecret(credReq.Password, refCred.Salt)
+		hash := ""
+		if credReq.Password != "" && credReq.UserHash == "" {
+			hash = crypto.GetHashOfSecret(credReq.Password, refCred.Salt)
+		} else {
+			hash = credReq.UserHash
+		}
 		//log.Println("Hash is: ", hash)
 		if hash == refCred.PasswordHash {
 			return tokenResult(200, credReq.Username, w)
@@ -66,7 +72,7 @@ func tokenResult(resultCode int, username string, w http.ResponseWriter) error {
 
 	switch resultCode {
 	case 200:
-		resp.Info = fmt.Sprintf("User credential OK")
+		resp.Info = "user credential OK"
 		expires := 3600
 		log.Printf("Create JWT Token for user %s, expires in %d", username, expires)
 		refCred := conf.Current.AdminCred
@@ -76,9 +82,9 @@ func tokenResult(resultCode int, username string, w http.ResponseWriter) error {
 		}
 		return writeResponse(w, &resp)
 	case 403:
-		resp.Info = fmt.Sprintf("User Unauthorized")
+		resp.Info = "user Unauthorized"
 	default:
-		resp.Info = fmt.Sprintf("User credential ERROR")
+		resp.Info = "user credential ERROR"
 	}
 
 	return writeErrorResponse(w, resp.ResultCode, resp)
@@ -87,7 +93,7 @@ func tokenResult(resultCode int, username string, w http.ResponseWriter) error {
 func checkRefreshToken(w http.ResponseWriter, refrTk string) error {
 
 	if refrTk == "" {
-		return fmt.Errorf("Refresh token is empty")
+		return fmt.Errorf("refresh token is empty")
 	}
 	if len(refrTk) > 10 {
 		b := len(refrTk) - 1

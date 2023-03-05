@@ -14,7 +14,7 @@ func UploadHandler(w http.ResponseWriter, req *http.Request) {
 	var err error
 	switch req.Method {
 	case "GET":
-		err = fmt.Errorf("Unsupported GET method in upload")
+		err = fmt.Errorf("unsupported GET method in upload")
 	case "POST":
 		log.Println("POST on ", req.RequestURI)
 		err = handleUploadPost(w, req)
