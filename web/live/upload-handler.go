@@ -2,9 +2,10 @@ package live
 
 import (
 	"fmt"
-	"io/ioutil"
+	"io"
 	"log"
 	"net/http"
+	"os"
 	"time"
 
 	"github.com/aaaasmile/live-blog/conf"
@@ -61,7 +62,7 @@ func procUpload(w http.ResponseWriter, req *http.Request) error {
 	// Create a temporary file within our temp-images directory that follows
 	// a particular naming pattern
 	now := time.Now()
-	tempFile, err := ioutil.TempFile(conf.Current.UploadDir, fmt.Sprintf("%s-*", now.Format("2006-01-02")))
+	tempFile, err := os.CreateTemp(conf.Current.UploadDir, fmt.Sprintf("%s-*", now.Format("2006-01-02")))
 	if err != nil {
 		return err
 	}
@@ -70,7 +71,7 @@ func procUpload(w http.ResponseWriter, req *http.Request) error {
 
 	// read all of the contents of our uploaded file into a
 	// byte array
-	fileBytes, err := ioutil.ReadAll(file)
+	fileBytes, err := io.ReadAll(file)
 	if err != nil {
 		fmt.Println(err)
 	}

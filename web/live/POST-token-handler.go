@@ -3,20 +3,21 @@ package live
 import (
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"log"
 	"net/http"
+	"strings"
 
 	"github.com/aaaasmile/live-blog/conf"
 	"github.com/aaaasmile/live-blog/crypto"
 )
 
 func handleToken(w http.ResponseWriter, req *http.Request) error {
-	rawbody, err := ioutil.ReadAll(req.Body)
+	rawbody, err := io.ReadAll(req.Body)
 	if err != nil {
 		return err
 	}
-	fmt.Println("*** Request: ", string(rawbody)) //do not log passwords
+	//fmt.Println("*** Request: ", string(rawbody))
 
 	credReq := struct {
 		Username string
@@ -101,7 +102,7 @@ func checkRefreshToken(w http.ResponseWriter, refrTk string) error {
 		log.Println("Check for refresh token ", refrTk[a:b])
 	}
 	refCred := conf.Current.AdminCred
-	user, err := refCred.ParseJwtToken(refrTk)
+	user, err := refCred.ParseJwtTokenForRefresh(refrTk)
 	if err != nil {
 		return err
 	}
@@ -109,4 +110,24 @@ func checkRefreshToken(w http.ResponseWriter, refrTk string) error {
 		return tokenResult(200, user, w)
 	}
 	return tokenResult(403, user, w)
+}
+
+func isRequestAuthorized(req *http.Request) (string, error) {
+	adminCred := conf.Current.AdminCred
+	user := ""
+	var err error
+	auth_tk := req.Header.Get("Authorization")
+	if auth_tk != "" {
+		tk := strings.Split(auth_tk, " ")
+		//fmt.Println("*** ", tk)
+		if len(tk) == 2 {
+			if tk[0] == "Bearer" {
+				user, err = adminCred.ParseJwtTokenForAuth(tk[1])
+				if err != nil {
+					return "", err
+				}
+			}
+		}
+	}
+	return user, nil
 }

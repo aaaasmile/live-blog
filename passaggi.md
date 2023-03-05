@@ -25,6 +25,12 @@ Per il Client vorrei avere un tool a linea di comando che esegue:
 
 list: Route API/list, validation: jwt in auth header. Mostra la lista delle risorse.
 
+## Token e Refresh token
+Ci sono due tipi di token, uno per il refresh (Token.RefreshToken) e uno per l'autenticazione (Token.AccessToken). 
+Il token refresh viene usato con il metodo Token nella API senza usare lo username. 
+Questo ritorna un nuovo Token completo (Token.AccessToken) che può essere usato nelle altre API. Il Refresh viene usato per non chiedere la password all'utente dopo la prima chiamata.
+Così si ha un'autenticazione che si rinnova automaticamente. 
+È possibile, nel client, l'uso dell'hash della password per generare il token (shared secret).
 
 
 ## Compilare per linux

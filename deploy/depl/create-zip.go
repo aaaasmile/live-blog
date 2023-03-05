@@ -3,7 +3,6 @@ package depl
 import (
 	"archive/zip"
 	"io"
-	"io/ioutil"
 	"log"
 	"os"
 	"path"
@@ -35,9 +34,7 @@ func getAllFiles(pathItems []string, rootPath string) []string {
 			arr := []string{}
 			arr = getFilesinDir(itemAbs, pathItem, arr)
 			//fmt.Println("Dir process result: ", arr)
-			for _, ele := range arr {
-				onlyFiles = append(onlyFiles, ele)
-			}
+			onlyFiles = append(onlyFiles, arr...)
 		} else {
 			onlyFiles = append(onlyFiles, pathItem)
 		}
@@ -48,7 +45,7 @@ func getAllFiles(pathItems []string, rootPath string) []string {
 func getFilesinDir(dirAbs string, dirRel string, ini []string) []string {
 	r := ini
 	log.Println("Scan dir ", dirAbs)
-	files, err := ioutil.ReadDir(dirAbs)
+	files, err := os.ReadDir(dirAbs)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -98,7 +95,7 @@ func zipFiles(rootDirAbs string, relFiles []string, outFilename string, fnPathRe
 
 		// Using FileInfoHeader() above only uses the basename of the file. If we want
 		// to preserve the folder structure we can overwrite this with the full path.
-		header.Name = fnPathRes(pathItem)//pathItem
+		header.Name = fnPathRes(pathItem) //pathItem
 
 		// Change to deflate to gain better compression
 		// see http://golang.org/pkg/archive/zip/#pkg-constants

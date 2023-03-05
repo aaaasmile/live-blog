@@ -3,41 +3,28 @@ package live
 import (
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"log"
 	"net/http"
 	"os"
 	"path"
 	"path/filepath"
-	"strings"
 
 	"github.com/aaaasmile/live-blog/conf"
 )
 
 func handleList(w http.ResponseWriter, req *http.Request) error {
 	log.Println("Handle List ", req.Header["Authorization"])
-	user := ""
-	var err error
-	adminCred := conf.Current.AdminCred
-	auth_tk := req.Header.Get("Authorization")
-	if auth_tk != "" {
-		tk := strings.Split(auth_tk, " ")
-		//fmt.Println("*** ", tk)
-		if len(tk) == 2 {
-			if tk[0] == "Bearer" {
-				user, err = adminCred.ParseJwtToken(tk[1])
-				if err != nil {
-					return err
-				}
-			}
-		}
+	user, err := isRequestAuthorized(req)
+	if err != nil {
+		return err
 	}
-
 	if user == "" {
 		return writeErrorResponse(w, 403, "")
 	}
+	log.Println("User is autorized", user)
 
-	rawbody, err := ioutil.ReadAll(req.Body)
+	rawbody, err := io.ReadAll(req.Body)
 	if err != nil {
 		return err
 	}
@@ -75,7 +62,7 @@ func listResult(reqPath string, w http.ResponseWriter) error {
 	pp := path.Join(conf.Current.UploadDir, reqPath)
 	targetPath, _ := filepath.Abs(pp)
 	fmt.Println("path is: ", targetPath)
-	files, err := ioutil.ReadDir(targetPath)
+	files, err := os.ReadDir(targetPath)
 	if err != nil {
 		return err
 	}

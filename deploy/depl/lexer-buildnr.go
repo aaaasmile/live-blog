@@ -2,8 +2,8 @@ package depl
 
 import (
 	"fmt"
-	"io/ioutil"
 	"log"
+	"os"
 	"strings"
 	"unicode"
 	"unicode/utf8"
@@ -42,13 +42,6 @@ type lexer struct {
 
 type stateFn func(*lexer) stateFn
 
-func (l *lexer) run() {
-	for state := lexText; state != nil; {
-		state(l)
-	}
-	close(l.items)
-}
-
 func (l *lexer) emit(t itemType) {
 	l.items <- item{t, l.input[l.start:l.pos]}
 	l.start = l.pos
@@ -80,12 +73,6 @@ func (l *lexer) errorf(format string, args ...interface{}) stateFn {
 		fmt.Sprintf(format, args...),
 	}
 	return nil
-}
-
-func (l *lexer) peek() rune {
-	ru := l.next()
-	l.backup()
-	return ru
 }
 
 func (l *lexer) nextItem() item {
@@ -181,7 +168,7 @@ func GetBuildVersionNr(str string, tokenBNR string) string {
 }
 
 func GetVersionNrFromFile(filename string, tokenBNR string) string {
-	buf, err := ioutil.ReadFile(filename)
+	buf, err := os.ReadFile(filename)
 	if err != nil {
 		log.Fatalln("Cannot read input file", err)
 	}

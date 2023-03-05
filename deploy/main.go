@@ -3,7 +3,6 @@ package main
 import (
 	"flag"
 	"fmt"
-	"io/ioutil"
 	"log"
 	"path/filepath"
 	"strings"
@@ -59,19 +58,4 @@ func getOutFileName(outdir string, tgt string) string {
 	s := fmt.Sprintf("LiveBlog_%s_%s_%s.zip", strings.Replace(vn, ".", "-", -1), currentTime.Format("02012006-150405"), tgt) // current date-time stamp using 2006 date time format template
 	s = filepath.Join(outdir, s)
 	return s
-}
-
-func testGetVersion() {
-	buf, err := ioutil.ReadFile("../web/idl/idl.go")
-	if err != nil {
-		log.Fatalln("Cannot read input file", err)
-	}
-	s := string(buf)
-	fmt.Println(s)
-	vn := depl.GetBuildVersionNr(s, "")
-	if vn == "" {
-		log.Fatalln("Version not found")
-	}
-	fmt.Println("Version is ", vn)
-	//depl.TestLexer()
 }
