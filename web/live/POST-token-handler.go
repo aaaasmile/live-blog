@@ -13,6 +13,7 @@ import (
 )
 
 func handleToken(w http.ResponseWriter, req *http.Request) error {
+	defer req.Body.Close()
 	rawbody, err := io.ReadAll(req.Body)
 	if err != nil {
 		return err

@@ -24,7 +24,7 @@ func handleList(w http.ResponseWriter, req *http.Request) (bool, error) {
 	}
 	was_auth = true
 	log.Println("User is autorized", user)
-
+	defer req.Body.Close()
 	rawbody, err := io.ReadAll(req.Body)
 	if err != nil {
 		return was_auth, err
