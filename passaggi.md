@@ -103,4 +103,6 @@ openssl rsa -in key.pem -pubout -out pubkey.pem
 
 ### Signi Disabled
 19.06.2026: Ho tolto il controllo per effettuare il login nel file js in quanto genera un traffico anomalo.
-
+Ho anche disabilitato il sito cambiando il file di configurazione su:
+/etc/nginx/sites-available
+che mi crea un redirect su invido.it
