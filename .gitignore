@@ -3,3 +3,4 @@
 *.pem
 /cert/*.*
 deploy/bash-files/_copy_app_to_invido.sh
+deploy/bash-files/_update-service.sh
