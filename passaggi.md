@@ -101,3 +101,6 @@ Il riferimento per i componenti: https://vuetifyjs.com/en/components/text-fields
 Per validare il token jwt occorre la chiave pubblica
 openssl rsa -in key.pem -pubout -out pubkey.pem
 
+### Signi Disabled
+19.06.2026: Ho tolto il controllo per effettuare il login nel file js in quanto genera un traffico anomalo.
+
