@@ -2,3 +2,4 @@
 *.bin
 *.pem
 /cert/*.*
+deploy/bash-files/_copy_app_to_invido.sh
